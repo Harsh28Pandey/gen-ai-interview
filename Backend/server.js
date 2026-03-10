@@ -7,6 +7,7 @@ connectDB()
 
 const PORT = 3000
 
+//* server starting
 app.listen(PORT, () => {
     console.log("Server is running on Port 3000")
 })
