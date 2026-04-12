@@ -1,13 +1,14 @@
 import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateResumePdf } from "../services/interview.api"
 import { useContext, useEffect } from "react"
 import { InterviewContext } from "../interview.context"
-import { useParams } from "react-router"
+// import { useParams } from "react-router"
+import { useState } from "react"
 
 
 export const useInterview = () => {
 
     const context = useContext(InterviewContext)
-    const { interviewId, setInterviewId } = useParams()
+    const [interviewId, setInterviewId] = useState(null)
 
     if (!context) {
         throw new Error("useInterview must be used within an InterviewProvider")
@@ -17,6 +18,8 @@ export const useInterview = () => {
 
     const generateReport = async (data) => {
         try {
+            setLoading(true) // ✅ show loading screen immediately
+
             const res = await generateInterviewReport(data)
 
             if (!res || !res.interviewReport) {
@@ -24,9 +27,13 @@ export const useInterview = () => {
             }
 
             setInterviewId(res.interviewReport._id)
+            return res.interviewReport
 
         } catch (err) {
-            console.error(err)
+            console.error("generateReport failed:", err)
+            throw err
+        } finally {
+            setLoading(false) // ✅ always hide loading when done
         }
     }
 
@@ -78,11 +85,14 @@ export const useInterview = () => {
         }
     }
 
+    // ✅ Fix - separate concerns clearly
+    useEffect(() => {
+        getReports() // fetch reports once on mount
+    }, [])
+
     useEffect(() => {
         if (interviewId) {
-            getReportById(interviewId)
-        } else {
-            getReports()
+            getReportById(interviewId) // only runs when interviewId changes
         }
     }, [interviewId])
 

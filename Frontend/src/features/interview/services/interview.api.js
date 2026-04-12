@@ -12,7 +12,7 @@ const api = axios.create({
 export const generateInterviewReport = async (data) => {
     const formData = new FormData()
 
-    formData.append("resume", data.resume) // file
+    formData.append("resume", data.resumeFile) // file
     formData.append("jobDescription", data.jobDescription)
     formData.append("selfDescription", data.selfDescription)
 

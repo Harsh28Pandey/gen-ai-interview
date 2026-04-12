@@ -13,9 +13,45 @@ const Home = () => {
     const navigate = useNavigate()
 
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[0]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        try {
+            const resumeFile = resumeInputRef.current?.files[0]
+
+            if (!resumeFile) {
+                alert("Please select a resume PDF file")
+                return
+            }
+
+            // ✅ Validate file type
+            if (resumeFile.type !== "application/pdf") {
+                alert("Only PDF files are allowed")
+                return
+            }
+
+            // ✅ Validate file size (max 5MB)
+            if (resumeFile.size > 5 * 1024 * 1024) {
+                alert("PDF file must be less than 5MB")
+                return
+            }
+
+            // ✅ Validate file is not empty
+            if (resumeFile.size === 0) {
+                alert("PDF file is empty")
+                return
+            }
+
+            const data = await generateReport({
+                jobDescription,
+                selfDescription,
+                resumeFile
+            })
+
+            if (!data || !data._id) return
+
+            navigate(`/interview/${data._id}`)
+
+        } catch (err) {
+            console.error("handleGenerateReport failed:", err)
+        }
     }
 
     if (loading) {
