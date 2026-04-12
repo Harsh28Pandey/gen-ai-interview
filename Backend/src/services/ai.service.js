@@ -14,12 +14,12 @@ const interviewReportSchema = z.object({
         question: z.string().describe("The technical question can be asked in the interview"),
         intention: z.string().describe("The intention of interviewer behind asking this question"),
         answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
-    })).describe("Technical questions that can be asked in the interview along with their intention and how to answer them"),
+    })).describe("Technical questions that can be asked in the interview along with their intention and how to answer them").min(5, "At least 5 technical questions are required"),
     behavioralQuestions: z.array(z.object({
         question: z.string().describe("The technical question can be asked in the interview"),
         intention: z.string().describe("The intention of interviewer behind asking this question"),
         answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
-    })).describe("Behavioral questions that can be asked in the interview along with their intention and how to answer them"),
+    })).describe("Behavioral questions that can be asked in the interview along with their intention and how to answer them").min(5, "At least 5 behavioral questions are required"),
     skillGaps: z.array(z.object({
         skill: z.string().describe("The skill which the candidate is lacking"),
         severity: z.enum(["low", "medium", "high"]).describe("The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances")
@@ -87,15 +87,16 @@ Job Description: ${jobDescription}
 `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-pro",
+            model: "gemini-2.5-pro",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
-                responseSchema: zodToJsonSchema(interviewReportSchema),
+                // responseSchema: zodToJsonSchema(interviewReportSchema),
             }
         });
 
         const raw = JSON.parse(response.text);
+        // console.log("RAW AI RESPONSE:", JSON.stringify(raw, null, 2))
         const parsed = interviewReportSchema.safeParse(raw);
 
         if (!parsed.success) throw new Error("Invalid AI response");
@@ -148,7 +149,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                     `
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.0-pro",
+        model: "gemini-2.5-pro",
         contents: prompt,
         config: {
             responseMimeType: "application/json",

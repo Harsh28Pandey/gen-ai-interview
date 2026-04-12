@@ -1,11 +1,9 @@
 const express = require("express")
-const authMiddleware = require("../middlewares/auth.middleware")
-const interviewController = require("../controllers/interview.controller")
-const upload = require("../middlewares/file.middleware")
+const authMiddleware = require("../middlewares/auth.middleware.js")
+const interviewController = require("../controllers/interview.controller.js")
+const upload = require("../middlewares/file.middleware.js")
 
 const interviewRouter = express.Router()
-
-
 
 /**
  * @route POST /api/interview/
