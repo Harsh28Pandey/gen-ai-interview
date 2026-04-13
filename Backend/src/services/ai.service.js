@@ -1,12 +1,14 @@
-const { GoogleGenAI } = require("@google/genai")
+// const { GoogleGenAI } = require("@google/genai")
+const Groq = require("groq-sdk")
 const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
 const puppeteer = require("puppeteer")
 
-const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_GENAI_API_KEY
-})
+// const ai = new GoogleGenAI({
+//     apiKey: process.env.GOOGLE_GENAI_API_KEY
+// })
 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
@@ -38,14 +40,29 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
         const prompt = `
 Generate a COMPLETE interview report in STRICT JSON format.
+MATCH SCORE INSTRUCTION:
+- Calculate matchScore (0–100) based on:
+  - Skills match (40%)
+  - Project/experience relevance (25%)
+  - Tools & technologies match (15%)
+  - Problem-solving & concepts (10%)
+  - Communication (from self description) (10%)
+
+- If candidate strongly matches most required skills → 80–100
+- Partial match → 50–79
+- Weak match → below 50
+
+- Do NOT give random scores
+- Justify score internally before assigning final number
+- Return ONLY a number (no explanation)
 
 IMPORTANT RULES:
 - Do NOT return empty arrays
 - Generate at least:
-  - 3 technicalQuestions
-  - 3 behavioralQuestions
-  - 3 skillGaps
-  - 5 preparationPlan entries
+  - 8 technicalQuestions
+  - 8 behavioralQuestions
+  - 5 skillGaps
+  - 7 preparationPlan entries
 
 technicalQuestions format:
 [
@@ -86,20 +103,43 @@ Self Description: ${selfDescription}
 Job Description: ${jobDescription}
 `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                // responseSchema: zodToJsonSchema(interviewReportSchema),
-            }
+        // const response = await ai.models.generateContent({
+        //     model: "gemini-2.0-flash",
+        //     contents: prompt,
+        //     config: {
+        //         responseMimeType: "application/json",
+        //         responseSchema: zodToJsonSchema(interviewReportSchema),
+        //     }
+        // });
+
+        // const raw = JSON.parse(response.candidates[0].content.parts[0].text);
+        // const raw = JSON.parse(response.text);
+        // console.log("RAW AI RESPONSE:", JSON.stringify(raw, null, 2))
+
+        const response = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an expert interview coach. Always respond with valid JSON only. No markdown, no explanation, no backticks."
+                },
+                { role: "user", content: prompt }
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7,
+            max_tokens: 4000,
         });
 
-        const raw = JSON.parse(response.text);
-        // console.log("RAW AI RESPONSE:", JSON.stringify(raw, null, 2))
+        const raw = JSON.parse(response.choices[0].message.content);
+        // console.log("RAW AI RESPONSE:", JSON.stringify(raw, null, 2));
         const parsed = interviewReportSchema.safeParse(raw);
 
-        if (!parsed.success) throw new Error("Invalid AI response");
+        // if (!parsed.success) throw new Error("Invalid AI response");
+
+        if (!parsed.success) {
+            console.error("Zod validation failed:", parsed.error.issues);
+            throw new Error("Invalid AI response");
+        }
 
         return parsed.data;
 
@@ -148,18 +188,33 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                         The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
                     `
 
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(resumePdfSchema),
-        }
+    // const response = await ai.models.generateContent({
+    //     model: "gemini-2.0-flash",
+    //     contents: prompt,
+    //     config: {
+    //         responseMimeType: "application/json",
+    //         responseSchema: zodToJsonSchema(resumePdfSchema),
+    //     }
+    // })
+
+
+    // const jsonContent = JSON.parse(response.text)
+
+    const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+            {
+                role: "system",
+                content: "You are a professional resume writer. Return only valid JSON with an html field. No markdown, no backticks."
+            },
+            { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.5,
+        max_tokens: 4000,
     })
 
-
-    const jsonContent = JSON.parse(response.text)
-
+    const jsonContent = JSON.parse(response.choices[0].message.content)
     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
     return pdfBuffer
