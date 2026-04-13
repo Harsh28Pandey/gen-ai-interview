@@ -1,2 +1,72 @@
-# GenAI-Interview
-Full-stack Generative AI Interview Preparation Platform with modern frontend and scalable backend. Users can practice AI-generated interview questions, receive intelligent feedback, track progress, and manage sessions. Built with secure authentication, real-time interactions, and efficient APIs for seamless learning and interview preparation.
+# 🚀 AI Interview Preparation Platform
+
+An AI-powered web application that helps users prepare for interviews by generating personalized questions, analyzing responses, and identifying skill gaps.
+
+---
+
+## 📌 Features
+
+- 🔐 User Authentication (Login & Register)
+- 🧠 AI-generated Technical & Behavioral Questions
+- 📊 Match Score based on user profile
+- 🎯 Skill Gap Analysis
+- 📄 Resume Upload or Self Description
+- 💡 Model Answers with Intentions
+- 🎨 Clean and Modern UI (Dark Theme)
+
+---
+
+## 🛠 Tech Stack
+
+**Frontend:**
+
+- React.js
+- CSS / Tailwind (if used)
+
+**Backend:**
+
+- Node.js
+- Express.js
+
+**Other:**
+
+- Generative AI APIs
+- (Add MongoDB / Firebase if used)
+
+---
+
+## 📷 Screenshots
+
+### 🔑 Login Page
+
+![Login Page](./screenshots/login.png)
+
+### 📝 Register Page
+
+![Register Page](./screenshots/register.png)
+
+### 🧠 Interview Plan Generator
+
+![Plan Generator](./screenshots/home.png)
+
+### 📊 Dashboard (Questions & Analysis)
+
+![Dashboard](./Screenshots/interview_home.png)
+
+---
+
+## ⚙️ Installation & Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/Harsh28Pandey/gen-ai-interview.git
+
+# Navigate to project folder
+cd gen-ai-interview
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
