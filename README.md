@@ -21,7 +21,7 @@ An AI-powered web application that helps users prepare for interviews by generat
 **Frontend:**
 
 - React.js
-- CSS / Tailwind (if used)
+- Tailwind CSS
 
 **Backend:**
 
@@ -31,7 +31,7 @@ An AI-powered web application that helps users prepare for interviews by generat
 **Other:**
 
 - Generative AI APIs
-- (Add MongoDB / Firebase if used)
+- MongoDB
 
 ---
 
