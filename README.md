@@ -39,15 +39,15 @@ An AI-powered web application that helps users prepare for interviews by generat
 
 ### 🔑 Login Page
 
-![Login Page](./screenshots/login.png)
+![Login Page](./Screenshots/login.png)
 
 ### 📝 Register Page
 
-![Register Page](./screenshots/register.png)
+![Register Page](./Screenshots/register.png)
 
 ### 🧠 Interview Plan Generator
 
-![Plan Generator](./screenshots/home.png)
+![Plan Generator](./Screenshots/home.png)
 
 ### 📊 Dashboard (Questions & Analysis)
 
@@ -60,13 +60,24 @@ An AI-powered web application that helps users prepare for interviews by generat
 ```bash
 # Clone the repository
 git clone https://github.com/Harsh28Pandey/gen-ai-interview.git
+```
 
 # Navigate to project folder
+
+```
 cd gen-ai-interview
+```
 
 # Install dependencies
+
+```
 npm install
+```
 
 # Start the development server
+
+```
 npm run dev
 ```
+
+---
